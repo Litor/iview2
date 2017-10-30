@@ -14,18 +14,25 @@
                     @click.native="clickCurrentRow(row._index)"
                     @dblclick.native.stop="dblclickCurrentRow(row._index)">
                     <td v-for="column in columns" :class="alignCls(column, row)">
-                        <Cell
-                            :fixed="fixed"
-                            :prefix-cls="prefixCls"
-                            :row="row"
-                            :key="column._columnKey"
-                            :column="column"
-                            :natural-index="index"
-                            :index="row._index"
-                            :checked="rowChecked(row._index)"
-                            :disabled="rowDisabled(row._index)"
-                            :expanded="rowExpanded(row._index)"
-                        ></Cell>
+                        <div :class="classes(column)" :title="column.ellipsis?row[column.key]:''">
+                            <template v-if="renderType(column) === 'index'">{{index + 1}}</template>
+                            <template v-if="renderType(column) === 'selection'">
+                                <Checkbox :value="checked" @click.native.stop="handleClick" @on-change="toggleSelect" :disabled="disabled"></Checkbox>
+                            </template>
+                            <template v-if="renderType(column) === 'html'"><span v-html="row[column.key]"></span></template>
+                            <template v-if="renderType(column) === 'normal'"><span>{{row[column.key]}}</span></template>
+                            <template v-if="renderType(column) === 'expand' && !row._disableExpand">
+                                <div :class="expandCls" @click="toggleExpand">
+                                    <Icon type="ios-arrow-right"></Icon>
+                                </div>
+                            </template>
+                            <Cell
+                                    v-if="renderType(column) === 'render'"
+                                    :row="row"
+                                    :column="column"
+                                    :index="row._index"
+                                    :render="column.render"></Cell>
+                        </div>
                     </td>
                 </table-tr>
                 <tr v-if="rowExpanded(row._index)">
@@ -40,7 +47,7 @@
 <script>
     // todo :key="row"
     import TableTr from './table-tr.vue';
-    import Cell from './cell.vue';
+    import Cell from './expand';
     import Expand from './expand.js';
     import Mixin from './mixin';
 
@@ -95,6 +102,45 @@
             },
             dblclickCurrentRow (_index) {
                 this.$parent.dblclickCurrentRow(_index);
+            },
+
+            toggleSelect () {
+                this.$parent.$parent.toggleSelect(this.index);
+            },
+            toggleExpand () {
+                this.$parent.$parent.toggleExpand(this.index);
+            },
+            handleClick () {
+                // 放置 Checkbox 冒泡
+            },
+            classes(column){
+                return [
+                    `${this.prefixCls}-cell`,
+                    {
+                        [`${this.prefixCls}-hidden`]: !this.fixed && column.fixed && (column.fixed === 'left' || column.fixed === 'right'),
+                        [`${this.prefixCls}-cell-ellipsis`]: column.ellipsis || false,
+                        [`${this.prefixCls}-cell-with-expand`]: this.renderType(column) === 'expand'
+                    }
+                ];
+            },
+
+            renderType(column){
+                var renderType = ''
+                if (column.type === 'index') {
+                    renderType = 'index';
+                } else if (column.type === 'selection') {
+                    renderType = 'selection';
+                } else if (column.type === 'html') {
+                    renderType = 'html';
+                } else if (column.type === 'expand') {
+                    renderType = 'expand';
+                } else if (column.render) {
+                    renderType = 'render';
+                } else {
+                    renderType = 'normal';
+                }
+
+                return renderType
             }
         }
     };

@@ -1,5 +1,5 @@
 <template>
-    <div :class="classes" ref="cell">
+    <div :class="classes" ref="cell" :title="column.ellipsis?row[column.key]:''">
         <template v-if="renderType === 'index'">{{naturalIndex + 1}}</template>
         <template v-if="renderType === 'selection'">
             <Checkbox :value="checked" @click.native.stop="handleClick" @on-change="toggleSelect" :disabled="disabled"></Checkbox>
