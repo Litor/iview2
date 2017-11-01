@@ -348,7 +348,10 @@
                     } else {
                         this.tableWidth = parseInt(getStyle(this.$el, 'width')) - 1;
                     }
-                    this.columnsWidth = {};
+                    if (this.data.length) {
+                        this.columnsWidth = {};
+                    }
+
                     this.$nextTick(() => {
                         let columnsWidth = {};
                         let autoWidthIndex = -1;
