@@ -5,14 +5,12 @@
         </colgroup>
         <tbody :class="[prefixCls + '-tbody']">
             <template v-for="(row, index) in data">
-                <table-tr
-                    :row="row"
-                    :key="row._rowKey"
-                    :prefix-cls="prefixCls"
+                <tr :class="rowClasses(row._index)"
                     @mouseenter.native.stop="handleMouseIn(row._index)"
                     @mouseleave.native.stop="handleMouseOut(row._index)"
                     @click.native="clickCurrentRow(row._index)"
-                    @dblclick.native.stop="dblclickCurrentRow(row._index)">
+                    @dblclick.native.stop="dblclickCurrentRow(row._index)"
+                >
                     <td v-for="column in columns" :class="alignCls(column, row)">
                         <div :class="classes(column)" :title="column.ellipsis?row[column.key]:''">
                             <template v-if="renderType(column) === 'index'">{{index + 1}}</template>
@@ -34,7 +32,7 @@
                                     :render="column.render"></Cell>
                         </div>
                     </td>
-                </table-tr>
+                </tr>
                 <tr v-if="rowExpanded(row._index)">
                     <td :colspan="columns.length" :class="prefixCls + '-expanded-cell'">
                         <Expand :key="row._rowKey" :row="row" :render="expandRender" :index="row._index"></Expand>
@@ -141,7 +139,21 @@
                 }
 
                 return renderType
-            }
+            },
+
+            rowClasses (_index) {
+                return [
+                    `${this.prefixCls}-row`,
+                    this.rowClsName(_index),
+                    {
+                        [`${this.prefixCls}-row-highlight`]: this.objData[_index] && this.objData[_index]._isHighlight,
+                        [`${this.prefixCls}-row-hover`]: this.objData[_index] && this.objData[_index]._isHover
+                    }
+                ];
+            },
+            rowClsName (_index) {
+                return this.$parent.rowClassName(this.objData[_index], _index);
+            },
         }
     };
 </script>
