@@ -1,7 +1,7 @@
 <template>
     <table cellspacing="0" cellpadding="0" border="0" :style="styleObject">
         <colgroup>
-            <col v-for="(column, index) in columns" :width="setCellWidth(column, index, false)">
+            <col v-for="(column, index) in columns" :width="setCellWidth(column, index, false, data)">
         </colgroup>
         <tbody :class="[prefixCls + '-tbody']">
             <template v-for="(row, index) in data">
@@ -15,12 +15,12 @@
                         <div :class="classes(column)" :title="column.ellipsis?row[column.key]:''">
                             <template v-if="renderType(column) === 'index'">{{index + 1}}</template>
                             <template v-if="renderType(column) === 'selection'">
-                                <Checkbox :value="checked" @click.native.stop="handleClick" @on-change="toggleSelect" :disabled="disabled"></Checkbox>
+                                <Checkbox :value="rowChecked(row._index)" @click.native.stop="handleClick" @on-change="toggleSelect(row._index)" :disabled="rowDisabled(row._index)"></Checkbox>
                             </template>
                             <template v-if="renderType(column) === 'html'"><span v-html="row[column.key]"></span></template>
                             <template v-if="renderType(column) === 'normal'"><span>{{row[column.key]}}</span></template>
                             <template v-if="renderType(column) === 'expand' && !row._disableExpand">
-                                <div :class="expandCls" @click="toggleExpand">
+                                <div :class="expandCls" @click="toggleExpand(row._index)">
                                     <Icon type="ios-arrow-right"></Icon>
                                 </div>
                             </template>
@@ -102,11 +102,11 @@
                 this.$parent.dblclickCurrentRow(_index);
             },
 
-            toggleSelect () {
-                this.$parent.$parent.toggleSelect(this.index);
+            toggleSelect (index) {
+                this.$parent.toggleSelect(index);
             },
-            toggleExpand () {
-                this.$parent.$parent.toggleExpand(this.index);
+            toggleExpand (index) {
+                this.$parent.toggleExpand(index);
             },
             handleClick () {
                 // 放置 Checkbox 冒泡
@@ -148,6 +148,15 @@
                     {
                         [`${this.prefixCls}-row-highlight`]: this.objData[_index] && this.objData[_index]._isHighlight,
                         [`${this.prefixCls}-row-hover`]: this.objData[_index] && this.objData[_index]._isHover
+                    }
+                ];
+            },
+
+            expandCls(_index){
+                return [
+                    `${this.prefixCls}-cell-expand`,
+                    {
+                        [`${this.prefixCls}-cell-expand-expanded`]: this.rowExpanded(_index)
                     }
                 ];
             },

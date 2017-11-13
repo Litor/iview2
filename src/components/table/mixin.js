@@ -17,7 +17,7 @@ export default {
         isPopperShow (column) {
             return column.filters && ((!this.fixed && !column.fixed) || (this.fixed === 'left' && column.fixed === 'left') || (this.fixed === 'right' && column.fixed === 'right'));
         },
-        setCellWidth (column, index, top) {
+        setCellWidth (column, index, top, data) {
             let width = '';
             if (column.width) {
                 width = column.width;
@@ -25,7 +25,7 @@ export default {
                 width = this.columnsWidth[column._index].width;
             }
             // when browser has scrollBar,set a width to resolve scroll position bug
-            if (this.columns.length === index + 1 && top && this.$parent.bodyHeight !== 0) {
+            if (this.columns.length === index + 1 && top && this.$parent.bodyHeight !== 0 && (data && data.length > 0)) {
                 width += this.$parent.scrollBarWidth;
             }
             // when fixed type,reset first right fixed column's width

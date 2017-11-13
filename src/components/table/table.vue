@@ -375,6 +375,8 @@
                                 };
                             }
                             this.columnsWidth = columnsWidth;
+                        }else{
+
                         }
                     });
                     // get table real height,for fixed when set height prop,but height < table's height,show scrollBarWidth
