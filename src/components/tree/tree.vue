@@ -163,7 +163,7 @@
                 this.updateTreeUp(nodeKey); // propagate up
                 this.updateTreeDown(node, {checked, indeterminate: false}); // reset `indeterminate` when going down
 
-                this.$emit('on-check-change', this.getCheckedNodes());
+                this.$emit('on-check-change', this.getCheckedNodes(), node);
             }
         },
         created(){
